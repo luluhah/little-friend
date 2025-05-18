@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>苹果魔法厨房</title>
+    <style>
+        /* body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        } */
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('images/bgc.png');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: none;
+        }
+
+        .kitchen-scene {
+            width: 100%;
+            height: 100%;
+            background-image: url('images/kitchen-bg.png');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .seasoning {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.3s;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 100px;
+            height: 120px;
+        }
+
+        .salt-shaker {
+            left: 150px;
+            top: 200px;
+            background-image: url('images/salt-shaker.png');
+            animation: shake 0.5s infinite;
+        }
+
+        .vinegar-bottle {
+            left: 350px;
+            top: 200px;
+            background-image: url('images/vinegar-bottle.png');
+            animation: tremble 0.3s infinite;
+        }
+
+        .sugar-jar {
+            left: 550px;
+            top: 200px;
+            background-image: url('images/sugar-jar.png');
+            animation: melt 2s infinite;
+        }
+
+        .interaction-item {
+            position: absolute;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 80px;
+            height: 80px;
+        }
+
+        .ice-cube {
+            background-image: url('images/ice-cube.png');
+            left: 350px;
+            top: 350px;
+        }
+
+        .spray-bottle {
+            background-image: url('images/spray-bottle.png');
+            left: 550px;
+            top: 350px;
+        }
+
+        .happy-nut {
+            background-image: url('images/happy-nut.png');
+            left: 150px;
+            top: 350px;
+        }
+
+        .panda {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background-image: url('images/panda.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            left: 50%;
+            top: 80px;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .success-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
+            animation: flash 1s;
+            pointer-events: none;
+            z-index: 30;
+        }
+
+        .success-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 24px;
+            color: #4CAF50;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            animation: popIn 0.5s;
+            z-index: 40;
+            font-weight: bold;
+        }
+
+        .hint {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            max-width: 150px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .hint.show {
+            opacity: 1;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(-5deg);
+            }
+
+            75% {
+                transform: rotate(5deg);
+            }
+        }
+
+        @keyframes tremble {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            25% {
+                transform: translate(-2px, 0);
+            }
+
+            75% {
+                transform: translate(2px, 0);
+            }
+        }
+
+        @keyframes melt {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(0.95);
+            }
+        }
+
+        @keyframes flash {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+
+            70% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .instruction {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
+            z-index: 20;
+        }
+
+        .progress {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        /* 开始和结束界面样式 */
+        .start-screen,
+        .end-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        h1 {
+            color: #66bb6a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .start-button,
+        .restart-button {
+            background-color: #66bb6a;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .start-button:hover,
+        .restart-button:hover {
+            background-color: #4caf50;
+            transform: scale(1.05);
+        }
+
+        .end-text {
+            font-size: 2.5rem;
+            color: #66bb6a;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <audio id="bgm" loop>
+        <source src="sounds/bgc.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 开始界面 -->
+    <div class="start-screen" id="start-screen">
+        <h1>苹果魔法厨房</h1>
+        <p>欢迎来到苹果魔法厨房！在这里，你需要帮助调料们找到正确的情绪调味料。</p>
+        <p>将对应的物品拖放到调料瓶上，或者点击它们与调料互动。</p>
+        <button class="start-button" id="start-button">开始游戏</button>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div class="game-container" id="game-container">
+        <div class="kitchen-scene">
+            <div class="instruction">帮助调料们找到正确的情绪调味料！</div>
+            <div class="panda"></div>
+
+            <!-- 调料瓶 -->
+            <div class="seasoning salt-shaker" id="saltShaker"></div>
+            <div class="seasoning vinegar-bottle" id="vinegarBottle"></div>
+            <div class="seasoning sugar-jar" id="sugarJar"></div>
+
+            <!-- 互动物品 -->
+            <div class="interaction-item happy-nut" id="happyNut"></div>
+            <div class="interaction-item ice-cube" id="iceCube"></div>
+            <div class="interaction-item spray-bottle" id="sprayBottle"></div>
+
+            <!-- 提示 -->
+            <div class="hint" id="sugarHint">点击开心果，让糖粉开心起来！</div>
+            <div class="hint" id="saltHint">把冰块拖到盐罐上，让它冷静下来！</div>
+            <div class="hint" id="vinegarHint">点击喷雾瓶，给醋瓶勇气！</div>
+
+            <div class="progress">已完成：<span id="progressCount">0</span>/3</div>
+        </div>
+    </div>
+
+    <!-- 结束界面 -->
+    <div class="end-screen" id="end-screen" style="display: none;">
+        <h1 class="end-text">恭喜你！所有调料都开心起来了！</h1>
+        <button class="restart-button" id="restart-button">返回开始页面</button>
+    </div>
+
+    <script>
+        let completedCount = 0;
+        const totalTasks = 3;
+        const bgm = document.getElementById('bgm');
+
+        // 显示互动物品
+        document.querySelectorAll('.interaction-item').forEach(item => {
+            item.style.opacity = '1';
+        });
+
+        // 显示提示
+        const hints = {
+            saltHint: document.getElementById('saltHint'),
+            vinegarHint: document.getElementById('vinegarHint'),
+            sugarHint: document.getElementById('sugarHint')
+        };
+
+        // 设置提示位置
+        hints.saltHint.style.left = '350px';
+        hints.saltHint.style.top = '450px';
+        hints.vinegarHint.style.left = '550px';
+        hints.vinegarHint.style.top = '450px';
+        hints.sugarHint.style.left = '150px';
+        hints.sugarHint.style.top = '450px';
+
+        // 显示所有提示
+        Object.values(hints).forEach(hint => {
+            hint.classList.add('show');
+        });
+
+        // 盐罐和冰块互动
+        const saltShaker = document.getElementById('saltShaker');
+        const iceCube = document.getElementById('iceCube');
+
+        iceCube.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', 'iceCube');
+        });
+
+        saltShaker.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        saltShaker.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const data = e.dataTransfer.getData('text/plain');
+            if (data === 'iceCube') {
+                handleSuccess('saltShaker', '冰块让盐罐冷静下来了！');
+            }
+        });
+
+        // 醋瓶和喷雾互动
+        const vinegarBottle = document.getElementById('vinegarBottle');
+        const sprayBottle = document.getElementById('sprayBottle');
+
+        sprayBottle.addEventListener('click', () => {
+            handleSuccess('vinegarBottle', '喷雾给了醋瓶勇气！');
+        });
+
+        // 糖粉和开心果互动
+        const sugarJar = document.getElementById('sugarJar');
+        const happyNut = document.getElementById('happyNut');
+
+        happyNut.addEventListener('click', () => {
+            handleSuccess('sugarJar', '开心果让糖粉开心起来了！');
+        });
+
+        // 成功处理函数
+        function handleSuccess(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.style.animation = 'none';
+
+            // 显示闪光特效
+            showSuccessEffect();
+
+            // 显示成功消息
+            setTimeout(() => {
+                showSuccessMessage(message);
+            }, 300);
+
+            completedCount++;
+            document.getElementById('progressCount').textContent = completedCount;
+
+            // 隐藏对应的提示
+            const hintId = elementId + 'Hint';
+            if (hints[hintId]) {
+                hints[hintId].classList.remove('show');
+            }
+
+            // 检查是否完成所有任务
+            if (completedCount === totalTasks) {
+                setTimeout(() => {
+                    showEndScreen();
+                }, 1000);
+            }
+        }
+
+        // 成功特效
+        function showSuccessEffect() {
+            const effect = document.createElement('div');
+            effect.className = 'success-effect';
+            document.querySelector('.kitchen-scene').appendChild(effect);
+            setTimeout(() => {
+                effect.remove();
+            }, 1000);
+        }
+
+        // 成功消息
+        function showSuccessMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'success-message';
+            messageElement.textContent = message;
+            document.querySelector('.kitchen-scene').appendChild(messageElement);
+            setTimeout(() => {
+                messageElement.remove();
+            }, 2000);
+        }
+
+        // 显示结束界面
+        function showEndScreen() {
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('end-screen').style.display = 'flex';
+            bgm.pause();
+        }
+
+        // 返回开始页面
+        function returnToStart() {
+            window.location.href = 'start.html';
+        }
+
+        // 事件监听
+        document.getElementById('start-button').addEventListener('click', () => {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+
+            // 尝试播放背景音乐
+            try {
+                bgm.volume = 0.5;
+                bgm.play();
+            } catch (error) {
+                console.log("背景音乐播放失败:", error);
+            }
+        });
+
+        document.getElementById('restart-button').addEventListener('click', returnToStart);
+    </script>
+</body>
+
+</html>

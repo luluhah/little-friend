@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>甜蜜交换站</title>
+    <style>
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('images/bgc.png');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 1200px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        .start-screen,
+        .victory-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .victory-screen {
+            display: none;
+        }
+
+        h1 {
+            color: #66bb6a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .fruits-row,
+        .animals-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .fruit {
+            width: 80px;
+            height: 80px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: grab;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #555;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .fruit:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .fruit.inactive {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .animal {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .animal-img {
+            width: 100%;
+            height: 100px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-bottom: 5px;
+        }
+
+        .animal-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .animal.selected {
+            border: 3px solid #66bb6a;
+            box-shadow: 0 0 15px rgba(102, 187, 106, 0.7);
+        }
+
+        .animal.happy {
+            animation: spin 0.8s ease-in-out;
+        }
+
+        .animal .question-mark {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 0, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 5;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 100;
+            display: none;
+        }
+
+        .message-box p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .message-box button {
+            background-color: #66bb6a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .message-box button:hover {
+            background-color: #4caf50;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            display: none;
+        }
+
+        .start-button,
+        .victory-button {
+            background-color: #66bb6a;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .start-button:hover,
+        .victory-button:hover {
+            background-color: #4caf50;
+            transform: scale(1.05);
+        }
+
+        .victory-text {
+            font-size: 3rem;
+            color: #66bb6a;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 开始界面 -->
+    <div class="start-screen" id="start-screen">
+        <h1>甜蜜交换站</h1>
+        <p>欢迎来到甜蜜交换站！在这里，你需要将水果拖放到对应的动物身上。</p>
+        <p>每个动物都有它喜欢的水果，点击动物可以查看提示。</p>
+        <button class="start-button" id="start-button">开始游戏</button>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div class="game-container" id="game-container">
+        <h1>甜蜜交换站</h1>
+        <div class="fruits-row" id="fruits-row"></div>
+        <div class="animals-row" id="animals-row"></div>
+    </div>
+
+    // 胜利界面
+    <div class="victory-screen" id="victory-screen">
+        <h1 class="victory-text">恭喜你！你真是太棒了！</h1>
+        <button class="victory-button" id="restart-button">进入下一关</button>
+    </div>
+
+
+
+    <!-- 消息框 -->
+    <div class="overlay" id="overlay"></div>
+    <div class="message-box" id="message-box">
+        <p id="message-text"></p>
+        <button id="message-btn">确定</button>
+    </div>
+
+    <!-- 音频元素 -->
+    <audio id="background-music" src="sounds/bgc.mp3" loop preload="auto"></audio>
+    <audio id="correct-sound" src="sounds/correct.mp3" preload="auto"></audio>
+    <audio id="victory-sound" src="sounds/victory.mp3" preload="auto"></audio>
+
+    <script>
+        // 游戏数据
+        const fruits = [
+            { id: 'apple', name: '苹果', emoji: '🍎' },
+            { id: 'banana', name: '香蕉', emoji: '🍌' },
+            { id: 'strawberry', name: '草莓', emoji: '🍓' },
+            { id: 'lemon', name: '柠檬', emoji: '🍋' },
+            { id: 'grape', name: '葡萄', emoji: '🍇' },
+            { id: 'watermelon', name: '西瓜', emoji: '🍉' },
+            { id: 'pear', name: '梨', emoji: '🍐' },
+            { id: 'orange', name: '橙子', emoji: '🍊' },
+            { id: 'mango', name: '芒果', emoji: '🥭' },
+            { id: 'papaya', name: '木瓜', emoji: '🍈' }
+        ];
+
+        const animals = [
+            { id: 'fox', name: '狐狸', fruit: 'lemon', img: 'huli.png', clue: '我想要... 酸酸甜甜的水果！' },
+            { id: 'giraffe', name: '长颈鹿', fruit: 'banana', img: 'changjinglu.png', clue: '我喜欢树上摘的，长长的...' },
+            { id: 'hedgehog', name: '刺猬', fruit: 'apple', img: 'ciwei.png', clue: '我要苹果！' },
+            { id: 'squirrel', name: '松鼠', fruit: 'grape', img: 'songshu.png', clue: '我想要一串紫色的小水果...' },
+            { id: 'elephant', name: '大象', fruit: 'watermelon', img: 'daxiang.png', clue: '我想要又大又圆的水果...' },
+            { id: 'rabbit', name: '兔子', fruit: 'strawberry', img: 'tuzi.png', clue: '我想要红红的水果...' },
+            { id: 'monkey', name: '猴子', fruit: 'mango', img: 'houzi.png', clue: '我想要黄色的，甜甜的水果...' },
+            { id: 'koala', name: '考拉', fruit: 'pear', img: 'kaola.png', clue: '我想要看起来像我耳朵的水果...' }
+        ];
+
+        const animalElements = [];
+
+        // 游戏状态
+        let gameState = {
+            matchedPairs: 0,
+            totalPairs: animals.length,
+            matchedFruits: new Set(),
+            matchedAnimals: new Set()
+        };
+
+        // DOM 元素
+        const startScreen = document.getElementById('start-screen');
+        const gameContainer = document.getElementById('game-container');
+        const victoryScreen = document.getElementById('victory-screen');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const fruitsRow = document.getElementById('fruits-row');
+        const animalsRow = document.getElementById('animals-row');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const messageBtn = document.getElementById('message-btn');
+        const overlay = document.getElementById('overlay');
+
+        // 音频元素
+        const backgroundMusic = document.getElementById('background-music');
+        const correctSound = document.getElementById('correct-sound');
+        const victorySound = document.getElementById('victory-sound');
+
+        // 设置correctSound的播放速度为1.5倍，音量为0.5
+        correctSound.playbackRate = 1.5;
+        correctSound.volume = 0.5;
+
+        // 初始化游戏
+        function initGame() {
+            gameState = {
+                matchedPairs: 0,
+                totalPairs: animals.length,
+                matchedFruits: new Set(),
+                matchedAnimals: new Set()
+            };
+
+            renderFruits();
+            renderAnimals();
+
+            // 尝试播放背景音乐
+            backgroundMusic.play().catch(e => {
+                console.log('自动播放背景音乐失败，请用户交互后播放。', e);
+            });
+        }
+
+        // 渲染水果
+        function renderFruits() {
+            fruitsRow.innerHTML = '';
+            fruits.forEach(fruit => {
+                if (!gameState.matchedFruits.has(fruit.id)) {
+                    const fruitElement = document.createElement('div');
+                    fruitElement.className = 'fruit';
+                    fruitElement.dataset.id = fruit.id;
+                    fruitElement.innerHTML = `<div style="font-size: 2rem;">${fruit.emoji}</div>`;
+                    fruitElement.draggable = true;
+                    fruitElement.addEventListener('dragstart', dragStart);
+                    fruitsRow.appendChild(fruitElement);
+                }
+            });
+        }
+
+        // 渲染动物
+        function renderAnimals() {
+            animalsRow.innerHTML = '';
+            animals.forEach(animal => {
+                const animalElement = document.createElement('div');
+                animalElement.className = 'animal';
+                animalElement.dataset.id = animal.id;
+                animalElements.push(animalElement);
+
+                const questionMark = document.createElement('div');
+                questionMark.className = 'question-mark';
+                questionMark.textContent = '?';
+
+                const imgElement = document.createElement('img');
+                imgElement.src = `images/${animal.img}`;
+                imgElement.alt = animal.name;
+                imgElement.style.width = '100%';
+                imgElement.style.height = '100px';
+                imgElement.style.objectFit = 'contain';
+
+                animalElement.appendChild(imgElement);
+                animalElement.appendChild(document.createElement('br'));
+                animalElement.appendChild(document.createTextNode(animal.name));
+                animalElement.appendChild(questionMark);
+
+                animalsRow.appendChild(animalElement);
+
+                animalElement.addEventListener('click', () => {
+                    showMessage(animal.clue);
+                });
+
+                animalElement.addEventListener('dragover', allowDrop);
+                animalElement.addEventListener('drop', drop);
+            });
+        }
+
+        // 拖拽开始
+        function dragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+        }
+
+        // 拖拽经过
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        // 放置
+        function drop(e) {
+            e.preventDefault();
+            const fruitId = e.dataTransfer.getData('text/plain');
+            const animalId = e.target.closest('.animal')?.dataset.id;
+
+            if (animalId) {
+                const animal = animals.find(a => a.id === animalId);
+                const fruit = fruits.find(f => f.id === fruitId);
+                if (fruit && animal) {
+                    if (fruit.id === animal.fruit) {
+                        correctMatch(animalId, fruitId, animal.name, fruit.name);
+                    } else {
+                        wrongMatch(animal.name, fruit.name);
+                    }
+                }
+            }
+        }
+
+        // 正确匹配
+        function correctMatch(animalId, fruitId, animalName, fruitName) {
+            gameState.matchedPairs++;
+            gameState.matchedFruits.add(fruitId);
+            gameState.matchedAnimals.add(animalId);
+
+            const fruitElement = document.querySelector(`.fruit[data-id="${fruitId}"]`);
+            if (fruitElement) {
+                fruitElement.classList.add('inactive');
+                fruitElement.draggable = false;
+            }
+
+            animalElements.forEach(animalElement => {
+                if (animalElement.dataset.id === animalId) {
+                    const questionMark = animalElement.querySelector('.question-mark');
+                    if (questionMark) {
+                        questionMark.style.display = 'none';
+                    }
+                }
+            });
+
+            // 播放正确音效
+            // correctSound.currentTime = 0;
+            // correctSound.play().catch(e => console.log('播放正确音效失败:', e));
+
+            showMessage(`太好吃啦！${animalName}很喜欢这个${fruitName}！`);
+
+            if (gameState.matchedPairs === gameState.totalPairs) {
+                setTimeout(() => {
+                    // 显示胜利界面
+                    gameContainer.style.display = 'none';
+                    victoryScreen.style.display = 'flex';
+                    // 停止背景音乐
+                    backgroundMusic.pause();
+                    backgroundMusic.currentTime = 0;
+                    // 播放胜利音效
+                    // victorySound.play().catch(e => console.log('播放胜利音效失败:', e));
+                }, 1000);
+            }
+        }
+
+        // 错误匹配
+        function wrongMatch(animalName, fruitName) {
+            showMessage(`这个${fruitName}不是${animalName}想要的...`);
+        }
+
+        // 显示消息
+        function showMessage(text) {
+            messageText.textContent = text;
+            messageBox.style.display = 'block';
+            overlay.style.display = 'block';
+
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+                overlay.style.display = 'none';
+            }, 1500);
+        }
+
+        // 事件监听
+        messageBtn.addEventListener('click', () => {
+            messageBox.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+
+        overlay.addEventListener('click', () => {
+            messageBox.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+
+        // 开始游戏按钮
+        startButton.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            gameContainer.style.display = 'block';
+            initGame();
+        });
+
+        // 重新开始按钮逻辑
+        restartButton.addEventListener('click', () => {
+            // 使用window.location.href来实现页面跳转到guanqia3.html
+            window.location.href = 'guanqia3.html';
+        });
+
+        // 初始化显示开始界面
+        startScreen.style.display = 'flex';
+    </script>
+</body>
+
+</html>

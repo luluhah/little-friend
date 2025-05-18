@@ -1,0 +1,352 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    touch-action: manipulation;
+}
+
+#game-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background-color: #f0f0f0;
+}
+
+.scene {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.scene.active {
+    display: block;
+}
+
+.background.forest {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #87CEEB, #90EE90);
+    background-image: url('assets/forest.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.sunlight {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.8), transparent 60%);
+    animation: sunlight-shift 10s infinite alternate;
+}
+
+.butterflies {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.butterfly {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-image: url('assets/butterfly.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.butterfly1 {
+    top: 20%;
+    left: 20%;
+    animation: butterfly-fly 8s infinite;
+}
+
+.butterfly2 {
+    top: 30%;
+    left: 50%;
+    animation: butterfly-fly 10s infinite;
+}
+
+.butterfly3 {
+    top: 15%;
+    left: 70%;
+    animation: butterfly-fly 12s infinite;
+}
+
+.butterfly4 {
+    top: 25%;
+    left: 10%;
+    animation: butterfly-fly 9s infinite;
+    transform: scale(0.8);
+}
+
+.butterfly5 {
+    top: 40%;
+    left: 30%;
+    animation: butterfly-fly 11s infinite;
+    transform: scale(0.9);
+}
+
+.butterfly6 {
+    top: 35%;
+    left: 80%;
+    animation: butterfly-fly 13s infinite;
+    transform: scale(0.7);
+}
+
+.butterfly7 {
+    top: 10%;
+    left: 60%;
+    animation: butterfly-fly 14s infinite;
+    transform: scale(0.8);
+}
+
+.apple-tree {
+    position: absolute;
+    width: 300px;
+    height: 400px;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-image: url('assets/apple-tree.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.animals-group {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 20px;
+    bottom: 15%;
+}
+
+.animal {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.rabbit {
+    background-image: url('assets/rabbit.png');
+}
+
+.squirrel {
+    background-image: url('assets/squirrel.png');
+}
+
+.deer {
+    background-image: url('assets/deer.png');
+}
+
+.panda {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-image: url('assets/panda.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.3s;
+}
+
+.panda.sad {
+    transform: translateX(-50%) scale(0.9);
+}
+
+.basket {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-image: url('assets/basket.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.basket.empty {
+    background-image: url('assets/basket-empty.png');
+}
+
+.wind-effect {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: wind 2s infinite;
+}
+
+.fog {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    animation: fog-in 2s forwards;
+}
+
+.fog.clearing {
+    animation: fog-out 2s forwards;
+}
+
+.magic-note {
+    position: absolute;
+    width: 200px;
+    height: 150px;
+    bottom: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-image: url('assets/magic-note.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: note-appear 1s forwards;
+}
+
+.story-text {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    text-align: center;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.text-line {
+    margin: 40px 0;
+    opacity: 0;
+    animation: text-fade-in 1s forwards;
+}
+
+.text-line:nth-child(1) { animation-delay: 0.5s; }
+.text-line:nth-child(2) { animation-delay: 2s; }
+.text-line:nth-child(3) { animation-delay: 3.5s; }
+
+.next-button {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    cursor: pointer;
+    opacity: 0;
+    animation: button-fade-in 1s forwards;
+    animation-delay: 4s;
+}
+
+.dialog-box {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dialog-text {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    color: #333;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.option-btn {
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background-color: #FFB6C1;
+    color: white;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.option-btn:hover {
+    background-color: #FF69B4;
+}
+
+.option-btn:active {
+    transform: scale(0.98);
+}
+
+/* Animations */
+@keyframes sunlight-shift {
+    from { transform: translate(-10%, -10%); }
+    to { transform: translate(10%, 10%); }
+}
+
+@keyframes butterfly-fly {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(50px, -30px) rotate(10deg); }
+    50% { transform: translate(100px, 0) rotate(0deg); }
+    75% { transform: translate(50px, 30px) rotate(-10deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes wind {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes fog-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fog-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes note-appear {
+    from { transform: translate(-50%, 100%); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@keyframes text-fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes button-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.bounce {
+    animation: bounce 1s infinite;
+} 

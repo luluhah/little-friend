@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寻找苹果</title>
+    <style>
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .background.forest {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('assets/forest.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .item {
+            cursor: pointer;
+            position: absolute;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .obstacle {
+            z-index: 2;
+        }
+
+        .apple {
+            width: 100px;
+            height: 100px;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .hint {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 18px;
+            z-index: 3;
+        }
+
+        .reward {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 4;
+            display: none;
+        }
+
+        .reward img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .bounce {
+            animation: bounce 1s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .hint {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            .apple {
+                width: 80px;
+                height: 80px;
+            }
+
+            .obstacle {
+                width: 100px !important;
+                height: 100px !important;
+            }
+        }
+
+        /* 开始界面和胜利界面样式 */
+        .start-screen,
+        .victory-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .victory-screen {
+            display: none;
+        }
+
+        h1 {
+            color: #66bb6a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .start-button,
+        .next-level-button {
+            background-color: #66bb6a;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .start-button:hover,
+        .next-level-button:hover {
+            background-color: #4caf50;
+            transform: scale(1.05);
+        }
+
+        .victory-text {
+            font-size: 3rem;
+            color: #66bb6a;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <div class="background forest"></div>
+        <div class="hint" id="hint"></div>
+        <div class="reward" id="reward">
+            <img src="assets/star.png" alt="星星">
+            <p>太棒了！你帮我找到了全部苹果！</p>
+        </div>
+    </div>
+
+    <!-- 开始界面 -->
+    <div class="start-screen" id="start-screen">
+        <h1>寻找苹果</h1>
+        <p>欢迎来到寻找苹果游戏！你的任务是帮助熊猫找到所有隐藏的苹果。</p>
+        <p>点击障碍物移开它们，找到隐藏在下面的苹果。</p>
+        <button class="start-button" id="start-button">开始游戏</button>
+    </div>
+
+    <!-- 胜利界面 -->
+    <div class="victory-screen" id="victory-screen">
+        <h1>恭喜你！</h1>
+        <p>你成功帮助熊猫找到了所有苹果！</p>
+        <button class="next-level-button" id="next-level-button">进入下一关</button>
+    </div>
+
+    <!-- 添加音频元素 -->
+    <audio id="background-music" src="sounds/bgc.mp3" loop></audio>
+
+    <script>
+        // 定义提示信息数组
+        const hints = [
+            "加油找苹果！",
+            "苹果可能在石头旁边哦！",
+            "我记得苹果是红色的，你看看有没有红色的东西。"
+        ];
+        let hintIndex = 0;
+        let applesFound = 0;
+        const applesNeeded = 3;
+        let obstaclesRemaining = [];
+
+        const startScreen = document.getElementById('start-screen');
+        const victoryScreen = document.getElementById('victory-screen');
+        const startButton = document.getElementById('start-button');
+        const nextLevelButton = document.getElementById('next-level-button');
+        const backgroundMusic = document.getElementById('background-music');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const gameContainer = document.getElementById('game-container');
+            const hintElement = document.getElementById('hint');
+            const rewardElement = document.getElementById('reward');
+
+            // 创建场景元素
+            createSceneElements();
+
+            // 显示初始提示
+            showHint();
+
+            // 处理触摸或点击事件
+            gameContainer.addEventListener('click', function (event) {
+                const target = event.target;
+                if (target.classList.contains('obstacle')) {
+                    // 移开障碍物
+                    target.style.opacity = '0';
+                    target.style.pointerEvents = 'none';
+                    // 从剩余障碍物列表中移除
+                    const obstacleIndex = obstaclesRemaining.indexOf(target.dataset.obstacle);
+                    if (obstacleIndex !== -1) {
+                        obstaclesRemaining.splice(obstacleIndex, 1);
+                    }
+                    // 显示障碍物下的苹果（如果有）
+                    const apple = target.nextElementSibling;
+                    if (apple && apple.classList.contains('apple')) {
+                        apple.style.opacity = '1';
+                    }
+                } else if (target.classList.contains('apple')) {
+                    // 找到苹果
+                    target.style.opacity = '0';
+                    target.style.pointerEvents = 'none';
+                    applesFound++;
+                    checkWinCondition();
+                }
+                // 每次点击更新提示信息
+                showHint();
+            });
+
+            function showHint() {
+                if (applesFound >= applesNeeded) {
+                    return;
+                }
+
+                if (obstaclesRemaining.length === 0) {
+                    hintElement.textContent = "你已经移开了所有障碍物！";
+                    return;
+                }
+
+                // 根据剩余障碍物生成提示信息
+                const obstacleNames = {
+                    "stone": "石头",
+                    "leaf": "树叶",
+                    "flower": "花朵"
+                };
+
+                const remainingObstacles = obstaclesRemaining.map(id => obstacleNames[id]);
+                let hintMessage = "";
+
+                if (remainingObstacles.length > 0) {
+                    if (remainingObstacles.length === 1) {
+                        hintMessage = `加油找苹果！苹果可能在${remainingObstacles[0]}旁边哦！`;
+                    } else {
+                        const lastObstacle = remainingObstacles.pop();
+                        const otherObstacles = remainingObstacles.join("、");
+                        hintMessage = `加油找苹果！苹果可能在${otherObstacles}和${lastObstacle}旁边哦！`;
+                    }
+                } else {
+                    hintMessage = hints[hintIndex];
+                    hintIndex = (hintIndex + 1) % hints.length;
+                }
+
+                hintElement.textContent = hintMessage;
+            }
+
+            function createSceneElements() {
+                // 获取容器尺寸
+                const containerWidth = gameContainer.clientWidth;
+                const containerHeight = gameContainer.clientHeight;
+
+                // 创建熊猫
+                const panda = document.createElement('div');
+                panda.className = 'item panda';
+                panda.style.position = 'absolute';
+                panda.style.width = '200px';
+                panda.style.height = '200px';
+                panda.style.bottom = '15%';
+                panda.style.left = '50%';
+                panda.style.transform = 'translateX(-50%)';
+                panda.style.backgroundImage = "url('assets/panda.png')";
+                gameContainer.appendChild(panda);
+
+                // 初始化剩余障碍物
+                obstaclesRemaining = ["stone", "leaf", "flower"];
+
+                // 定义障碍物信息（位置和大小随屏幕尺寸调整）
+                const obstacles = [
+                    { id: "stone", src: "assets/storn.png", left: containerWidth * 0.15, top: containerHeight * 0.6 },
+                    { id: "leaf", src: "assets/leaf.png", left: containerWidth * 0.4, top: containerHeight * 0.1 },
+                    { id: "flower", src: "assets/flower.png", left: containerWidth * 0.75, top: containerHeight * 0.5 }
+                ];
+
+                // 创建障碍物和苹果
+                obstacles.forEach(obstacle => {
+                    const obstacleElement = document.createElement('img');
+                    obstacleElement.src = obstacle.src;
+                    obstacleElement.className = 'item obstacle';
+                    obstacleElement.style.position = 'absolute';
+                    obstacleElement.style.left = obstacle.left + 'px';
+                    obstacleElement.style.top = obstacle.top + 'px';
+                    obstacleElement.style.width = '250px';
+                    obstacleElement.style.height = '250px';
+                    obstacleElement.dataset.obstacle = obstacle.id;
+                    gameContainer.appendChild(obstacleElement);
+
+                    // 创建苹果
+                    const apple = document.createElement('img');
+                    apple.src = "assets/apple.png";
+                    apple.className = 'item apple';
+                    apple.style.position = 'absolute';
+                    apple.style.left = (obstacle.left + 30) + 'px';
+                    apple.style.top = (obstacle.top + 30) + 'px';
+                    gameContainer.appendChild(apple);
+                });
+            }
+
+            function checkWinCondition() {
+                if (applesFound >= applesNeeded) {
+                    // 显示奖励
+                    rewardElement.style.display = 'block';
+                    rewardElement.classList.add('bounce');
+                    // 显示胜利界面
+                    setTimeout(() => {
+                        victoryScreen.style.display = 'flex';
+                    }, 1000);
+                }
+            }
+
+            // 开始游戏按钮点击事件
+            startButton.addEventListener('click', function () {
+                startScreen.style.display = 'none';
+                // 播放背景音乐
+                backgroundMusic.play().catch(e => {
+                    console.log('自动播放背景音乐失败，请用户交互后播放。', e);
+                });
+            });
+
+            // 进入下一关按钮点击事件
+            nextLevelButton.addEventListener('click', function () {
+                // 停止背景音乐
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+                window.location.href = 'guanqia2.html';
+            });
+
+            // 添加响应式调整
+            window.addEventListener('resize', function () {
+                // 清除现有元素
+                const items = document.querySelectorAll('.item');
+                items.forEach(item => {
+                    if (item !== document.querySelector('.panda')) {
+                        item.remove();
+                    }
+                });
+
+                // 重新创建元素
+                createSceneElements();
+            });
+        });
+    </script>
+</body>
+
+</html>

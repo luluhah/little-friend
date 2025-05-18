@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小小朋友</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="game-container">
+        <div id="scene-container">
+            <div id="opening-scene" class="scene active">
+                <div class="background forest">
+                    <div class="sunlight"></div>
+                    <div class="butterflies">
+                        <div class="butterfly butterfly1"></div>
+                        <div class="butterfly butterfly2"></div>
+                        <div class="butterfly butterfly3"></div>
+                        <div class="butterfly butterfly4"></div>
+                        <div class="butterfly butterfly5"></div>
+                        <div class="butterfly butterfly6"></div>
+                        <div class="butterfly butterfly7"></div>
+                    </div>
+                </div>
+                <div class="characters">
+                    <div class="animals-group">
+                        <div class="animal rabbit"></div>
+                        <div class="animal squirrel"></div>
+                        <div class="animal deer"></div>
+                    </div>
+                    <div class="panda">
+                        <div class="basket"></div>
+                    </div>
+                </div>
+                <div class="story-text">
+                    <p class="text-line">清晨的森林阳光斑驳，五彩斑斓的蝴蝶在天空中飞舞。</p>
+                    <p class="text-line">一群小动物们围坐在森林中，准备举办一场"水果分享会"。</p>
+                    <p class="text-line">小熊猫正兴奋地抱着一篮子红彤彤的苹果，准备分给朋友们。</p>
+                </div>
+                <div class="next-button">点击继续</div>
+            </div>
+            <div id="wind-scene" class="scene">
+                <div class="background forest">
+                    <div class="wind-effect"></div>
+                    <div class="fog"></div>
+                </div>
+                <div class="characters">
+                    <div class="panda sad">
+                        <div class="basket empty"></div>
+                    </div>
+                </div>
+                <div class="story-text">
+                    <p class="text-line">突然，一阵狂风刮过，树叶沙沙作响。</p>
+                    <p class="text-line">篮子里的苹果被一股神秘的力量吸走，消失在浓雾中！</p>
+                </div>
+                <div class="next-button">点击继续</div>
+            </div>
+            <div id="note-scene" class="scene">
+                <div class="background forest">
+                    <div class="fog clearing"></div>
+                </div>
+                <div class="characters">
+                    <div class="panda sad"></div>
+                    <div class="magic-note"></div>
+                </div>
+                <div class="story-text">
+                    <p class="text-line">浓雾散去后，地上留下一张闪烁着金光的纸条。</p>
+                    <p class="text-line">"想要找回苹果？先解开森林的秘密吧！"</p>
+                </div>
+                <div class="next-button">点击继续</div>
+            </div>
+            <div id="dialog-scene" class="scene">
+                <div class="background forest"></div>
+                <div class="characters">
+                    <div class="panda"></div>
+                </div>
+                <div class="dialog-box">
+                    <p class="dialog-text">你愿意帮我吗？如果找不到苹果，水果分享会就开不成了...</p>
+                    <div class="options">
+                        <button class="option-btn" data-option="A">我一定帮你找到苹果！</button>
+                        <button class="option-btn" data-option="B">我试试看，但需要你的帮助哦！</button>
+                        <button class="option-btn" data-option="C">为什么要我帮？</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+
+</html>
