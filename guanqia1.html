@@ -311,9 +311,9 @@
 
                 // 定义障碍物信息（位置和大小随屏幕尺寸调整）
                 const obstacles = [
-                    { id: "stone", src: "assets/storn.png", left: containerWidth * 0.15, top: containerHeight * 0.6 },
-                    { id: "leaf", src: "assets/leaf.png", left: containerWidth * 0.4, top: containerHeight * 0.1 },
-                    { id: "flower", src: "assets/flower.png", left: containerWidth * 0.75, top: containerHeight * 0.5 }
+                    { id: "stone", src: "assets/storn.png", left: containerWidth * 0.05, top: containerHeight * 0.8 },
+                    { id: "leaf", src: "assets/leaf.png", left: containerWidth * 0.9, top: containerHeight * 0.02 },
+                    { id: "flower", src: "assets/flower.png", left: containerWidth * 0.2, top: containerHeight * 0.2 }
                 ];
 
                 // 创建障碍物和苹果
@@ -324,8 +324,8 @@
                     obstacleElement.style.position = 'absolute';
                     obstacleElement.style.left = obstacle.left + 'px';
                     obstacleElement.style.top = obstacle.top + 'px';
-                    obstacleElement.style.width = '250px';
-                    obstacleElement.style.height = '250px';
+                    obstacleElement.style.width = '60px';
+                    obstacleElement.style.height = '60px';
                     obstacleElement.dataset.obstacle = obstacle.id;
                     gameContainer.appendChild(obstacleElement);
 
